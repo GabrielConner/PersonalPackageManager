@@ -40,13 +40,13 @@ namespace PersonalPackageManager {
 
 
     //----------------------------------------------------------------------------------------------------
-    public static void Add(List<string> args, Dictionary<string, PackageEntry> packages, ProjectGrouping grouping, bool change) {
+    public static void Add(List<string> args, Dictionary<string, PackageEntry> packages, ProjectGrouping grouping) {
       if (!PackageManager.PackageList.ContainsKey(args[1])) {
         Console.WriteLine("Invalid package name");
         return;
       }
 
-      if (!change && packages.ContainsKey(args[1])) {
+      if (packages.ContainsKey(args[1])) {
         Console.WriteLine($"{args[1]} is already in this project with version {packages[args[1]].Version}");
         return;
       }
@@ -69,9 +69,7 @@ namespace PersonalPackageManager {
         Name = args[1],
         Version = version,
       };
-      if (!change) {
-        packages.Add(args[1], entry);
-      }
+      packages.Add(args[1], entry);
 
 
 
@@ -202,7 +200,7 @@ namespace PersonalPackageManager {
               List<string> tArgs = ["add"];
               tArgs.AddRange(dependency.Split(':', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries));
 
-              Add(tArgs, packages, grouping, false);
+              Add(tArgs, packages, grouping);
             }
 
             break;
@@ -248,8 +246,8 @@ namespace PersonalPackageManager {
 
 
 
-      Remove(args, packages, grouping, true);
-      Add(args, packages, grouping, true);
+      Remove(args, packages, grouping);
+      Add(args, packages, grouping);
 
 
       /*string packagePath = PackageManager.PackageList[args[1]];
@@ -367,7 +365,7 @@ namespace PersonalPackageManager {
 
 
     //----------------------------------------------------------------------------------------------------
-    public static void Remove(List<string> args, Dictionary<string, PackageEntry> packages, ProjectGrouping grouping, bool change) {
+    public static void Remove(List<string> args, Dictionary<string, PackageEntry> packages, ProjectGrouping grouping) {
       if (!packages.ContainsKey(args[1])) {
         Console.WriteLine("Invalid package");
         return;
@@ -437,9 +435,7 @@ namespace PersonalPackageManager {
       List<string> packageVersionAndName = [packageName, packageName + $"_{GetValidMacroName(entry.Version).ToUpper()}"];
       grouping.RemovePreprocessorDefinitions(packageVersionAndName);
 
-      if (!change) {
-        packages.Remove(args[1]);
-      }
+      packages.Remove(args[1]);
     }
 
 
@@ -641,7 +637,7 @@ namespace PersonalPackageManager {
               continue;
             }
 
-            Add(args, packages, grouping, false);
+            Add(args, packages, grouping);
             changed = true;
 
             PackageManager.EnterToContinue();
@@ -656,7 +652,7 @@ namespace PersonalPackageManager {
               continue;
             }
 
-            Remove(args, packages, grouping, false);
+            Remove(args, packages, grouping);
 
             changed = true;
             PackageManager.EnterToContinue();

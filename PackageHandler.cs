@@ -39,10 +39,9 @@ namespace PersonalPackageManager {
             Console.WriteLine("/?");
             Console.WriteLine("  Displays commands\n");
             Console.WriteLine("-l");
-            Console.WriteLine("list [ package [ version ] ]");
+            Console.WriteLine("list [ package ]");
             Console.WriteLine("  Lists all packages");
             Console.WriteLine("     package   Specific package to list");
-            Console.WriteLine("     version   Specific package version to list\n");
             Console.WriteLine("-i");
             Console.WriteLine("init");
             Console.WriteLine("inititialize { package }");
@@ -76,48 +75,18 @@ namespace PersonalPackageManager {
               if (!PackageManager.PackageList.ContainsKey(args[1])) {
                 Console.WriteLine("Invalid package name");
                 PackageManager.EnterToContinue();
-                PackageManager.EnterToContinue();
                 continue;
               }
-              package = PackageManager.PackageList[args[2]];
+              package = PackageManager.PackageList[args[1]];
 
-
-
-              if (args.Count >= 3) {
-                string fullPath = Path.Combine(package, args[2]);
-                string savePath = Path.Combine(fullPath, ".ppm_pdata");
-
-                if (!Directory.Exists(fullPath)) {
-                  Console.WriteLine("Invalid package version");
-                  PackageManager.EnterToContinue();
-                  continue;
-                }
-
-                foreach (string dir in Directory.EnumerateDirectories(fullPath)) {
-                  Console.WriteLine(Path.GetRelativePath(fullPath, dir).ToUpper());
-                  foreach (string path in Directory.EnumerateFileSystemEntries(dir)) {
-                    Console.WriteLine($"  {Path.GetRelativePath(dir, path)}");
-                  }
-                  Console.WriteLine();
-                }
-
-                if (File.Exists(savePath)) {
-                  Console.WriteLine("SETTINGS\n");
-
-                  foreach (string line in File.ReadLines(savePath)) {
-                    string[] spl = line.Split("*-");
-
-                    Console.WriteLine($"{spl[0]} --- {spl[1]}\n");
-                  }
-                }
-
+              if (!Directory.Exists(package)) {
+                Console.WriteLine("Invalid package");
                 PackageManager.EnterToContinue();
                 continue;
               }
 
-
-              foreach (string p in Directory.EnumerateFileSystemEntries(package)) {
-                Console.WriteLine(Path.GetRelativePath(package, p));
+              foreach (string dir in Directory.EnumerateDirectories(package)) {
+                Console.WriteLine(Path.GetRelativePath(package, dir));
               }
 
               PackageManager.EnterToContinue();
@@ -180,7 +149,7 @@ namespace PersonalPackageManager {
 
           case "-s":
           case "settings":
-            if (args.Count < 3) {
+            if (args.Count < 2) {
               Console.WriteLine("Invalid arguements");
               PackageManager.EnterToContinue();
               continue;
@@ -194,8 +163,8 @@ namespace PersonalPackageManager {
             package = PackageManager.PackageList[args[1]];
 
             string version = "live";
-            if (args.Count >= 4)
-              version = args[3];
+            if (args.Count > 2)
+              version = args[2];
 
             string pathTo = Path.Combine(package, version);
             string settingsPath = Path.Combine(pathTo, ".ppm_pdata");
